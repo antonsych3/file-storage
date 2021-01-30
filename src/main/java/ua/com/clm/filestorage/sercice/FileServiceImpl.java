@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ua.com.clm.filestorage.configuration.ErrorMessages;
 import ua.com.clm.filestorage.dto.FilesResponseDto;
 import ua.com.clm.filestorage.exception.BadRequestException;
 import ua.com.clm.filestorage.exception.FileNotFoundException;
@@ -94,11 +93,11 @@ public class FileServiceImpl implements FileService {
 
     private void throwBadRequestException(String id) {
         log.error("Here is no that(-ose) tag(-s) on this file ({})", id);
-        throw new BadRequestException(ErrorMessages.TAG_NOT_NOT_FOUND);
+        throw new BadRequestException("tag not found on file");
     }
 
     private void throwFileNotFoundException(String id) {
         log.error("File with id = {} does not exist", id);
-        throw new FileNotFoundException(ErrorMessages.FILE_NOT_FOUND);
+        throw new FileNotFoundException("file not found");
     }
 }
