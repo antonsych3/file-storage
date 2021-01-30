@@ -29,3 +29,4 @@ mvn clean package
 ```shell script
 mvn spring-boot:run
 ```
+4. For requests use http://localhost:8080
