@@ -77,14 +77,14 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    public FilesResponseDto getFilesByTags(String[] tags, int page, int size) {
+    public FilesResponseDto getFilesByTags(List<String> tags, int page, int size) {
         FilesResponseDto resultDto = new FilesResponseDto();
         Page<File> pageableFiles;
 
-        if (tags.length == 0) {
+        if (tags.size() == 0) {
             pageableFiles = fileRepository.findAll(PageRequest.of(page, size));
         } else {
-            pageableFiles = fileRepository.findAllByTags(Arrays.asList(tags), PageRequest.of(page, size));
+            pageableFiles = fileRepository.findAllByTags(tags, PageRequest.of(page, size));
         }
         resultDto.setTotal((int) pageableFiles.getTotalElements());
         resultDto.setFiles(pageableFiles.getContent());
@@ -92,7 +92,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private void throwBadRequestException(String id) {
-        log.error("Here is no that(-ose) tag(-s) on this file ({})", id);
+        log.error("Here is no those tags on this file ({})", id);
         throw new BadRequestException("tag not found on file");
     }
 

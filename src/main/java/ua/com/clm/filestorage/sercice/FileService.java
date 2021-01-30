@@ -3,6 +3,8 @@ package ua.com.clm.filestorage.sercice;
 import ua.com.clm.filestorage.dto.FilesResponseDto;
 import ua.com.clm.filestorage.model.File;
 
+import java.util.List;
+
 public interface FileService {
 
     File uploadFile(File file);
@@ -13,5 +15,5 @@ public interface FileService {
 
     void removeTags(String[] tags, String id);
 
-    FilesResponseDto getFilesByTags(String[] tags, int page, int size);
+    FilesResponseDto getFilesByTags(List<String> tags, int page, int size);
 }
