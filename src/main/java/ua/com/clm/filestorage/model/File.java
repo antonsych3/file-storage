@@ -26,7 +26,7 @@ public class File implements BaseFile {
     @Field(type = FieldType.Long)
     private long size;
 
-    @Field(type = FieldType.Nested)
+    @Field(type = FieldType.Nested, searchAnalyzer = "true")
     private List<String> tags = new ArrayList<>();
 
     public File(FileRequestDto fileRequestDto) {

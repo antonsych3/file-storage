@@ -11,9 +11,9 @@ public interface FileService {
 
     void deleteFileById(String id);
 
-    void assignTags(String[] tags, String id);
+    void assignTags(List<String> tags, String id);
 
-    void removeTags(String[] tags, String id);
+    void removeTags(List<String> tags, String id);
 
     FilesResponseDto getFilesByTags(List<String> tags, int page, int size);
 }
