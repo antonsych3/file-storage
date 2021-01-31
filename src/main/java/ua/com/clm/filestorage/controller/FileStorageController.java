@@ -55,7 +55,7 @@ public class FileStorageController {
 
     @PostMapping("/{ID}/tags")
     @ResponseBody
-    public ResponseDto assignTags(@RequestBody String[] tags, @PathVariable("ID") String id) {
+    public ResponseDto assignTags(@RequestBody List<String> tags, @PathVariable("ID") String id) {
         log.info("[x]Request to assign tags - {} for file with id = {}", tags, id);
         fileService.assignTags(tags, id);
         log.info("[x]Assigned tags - {} on the file with id = {}", tags, id);
@@ -64,14 +64,14 @@ public class FileStorageController {
 
     @DeleteMapping("/{ID}/tags")
     @ResponseBody
-    public ResponseDto removeTags(@RequestBody String[] tags, @PathVariable("ID") String id) {
+    public ResponseDto removeTags(@RequestBody List<String> tags, @PathVariable("ID") String id) {
         log.info("[x]Request to remove tags - {} for file with id = {}", tags, id);
         fileService.removeTags(tags, id);
         log.info("[x]Removed tags - {} from file with id = {}", tags, id);
         return new ResponseDto(true);
     }
 
-    public void checkRequest(FileRequestDto request) {
+    private void checkRequest(FileRequestDto request) {
         if (request.getName() == null) {
             log.error("[x]Some field for upload file request is empty - {}", request);
             throw new BadRequestException("empty name field");
