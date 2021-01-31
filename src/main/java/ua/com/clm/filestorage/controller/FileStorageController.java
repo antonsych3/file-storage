@@ -22,7 +22,7 @@ public class FileStorageController {
 
     private final FileService fileService;
 
-    @GetMapping("")
+    @GetMapping
     @ResponseBody
     public FilesResponseDto getFiles(@RequestParam(defaultValue = "", required = false) List<String> tags,
                                      @RequestParam(defaultValue = "0", required = false) int page,
@@ -34,7 +34,7 @@ public class FileStorageController {
     }
 
 
-    @PostMapping("")
+    @PostMapping
     @ResponseBody
     public BaseFile uploadFile(@RequestBody FileRequestDto fileRequestDto) {
         log.info("REQUEST TO UPLOAD FILE - {}", fileRequestDto.getName());

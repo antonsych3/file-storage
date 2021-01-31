@@ -2,8 +2,16 @@ package ua.com.clm.filestorage.sercice;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.lucene.search.join.ScoreMode;
+import org.elasticsearch.index.query.NestedQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import ua.com.clm.filestorage.dto.FilesResponseDto;
 import ua.com.clm.filestorage.exception.BadRequestException;
@@ -16,11 +24,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.elasticsearch.index.query.QueryBuilders.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
+    private final ElasticsearchOperations elasticsearchOperations;
     private final FileRepository fileRepository;
 
     public File uploadFile(File file) {
@@ -81,7 +92,9 @@ public class FileServiceImpl implements FileService {
         FilesResponseDto resultDto = new FilesResponseDto();
         Page<File> pageableFiles;
 
-        if (tags.size() == 0) {
+
+
+        if (tags.isEmpty()) {
             pageableFiles = fileRepository.findAll(PageRequest.of(page, size));
         } else {
             pageableFiles = fileRepository.findAllByTags(tags, PageRequest.of(page, size));
