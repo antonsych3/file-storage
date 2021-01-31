@@ -25,6 +25,8 @@ and run it on ***localhost***, port ***9200***. Check [link](http://localhost:92
 ```shell script
 mvn clean package
 ```
+You can add "-Dmaven.test.skip=true" for skipping tests.  
+
 3. Then run next command  
 ```shell script
 mvn spring-boot:run
