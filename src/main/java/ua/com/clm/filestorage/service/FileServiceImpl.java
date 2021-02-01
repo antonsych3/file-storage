@@ -59,10 +59,6 @@ public class FileServiceImpl implements FileService {
                 .findById(id)
                 .map(v -> {
                     List<String> actualTags = v.getTags();
-//                    if (actualTags == null) {
-//                        log.debug("[x]Here is no tag on this file ({})", id);
-//                        actualTags = new ArrayList<>();
-//                    }
                     actualTags = actualTags == null ? new ArrayList<>() : actualTags;
                     actualTags.addAll(tags);
                     v.setTags(actualTags);
@@ -113,7 +109,7 @@ public class FileServiceImpl implements FileService {
         String[] nameArray = file.getName().trim().split("\\.");
         String extension = nameArray[nameArray.length - 1];
         List<String> tags = new ArrayList<>();
-        BaseTag tag = (BaseTag) ALL_EXTENSIONS.get(extension);
+        BaseTag tag = (BaseTag) ALL_EXTENSIONS.get(extension.toLowerCase());
         if (tag != null) {
             tags.add(tag.getName());
             file.setTags(tags);
