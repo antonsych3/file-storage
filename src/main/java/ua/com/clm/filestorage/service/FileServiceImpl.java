@@ -55,8 +55,12 @@ public class FileServiceImpl implements FileService {
         fileRepository
                 .findById(id)
                 .map(v -> {
-                    List<String> actualTags = (v.getTags()== null) ? new ArrayList<>() : v.getTags();
-                    actualTags.addAll(tags);
+                    List<String> actualTags = (v.getTags() == null) ? new ArrayList<>() : v.getTags();
+                    for (String tag : tags) {
+                        if (!actualTags.contains(tag)) {
+                            actualTags.add(tag);
+                        }
+                    }
                     v.setTags(actualTags);
                     return fileRepository.save(v);
                 })
