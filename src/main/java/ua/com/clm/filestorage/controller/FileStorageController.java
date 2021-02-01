@@ -76,8 +76,7 @@ public class FileStorageController {
             log.error("[x]Some field for upload file request is empty - {}", request);
             throw new BadRequestException("empty name field");
         }
-        String trimmedName = request.getName().trim();
-        if (request.getSize() < 0 || trimmedName.equals("")) {
+        if (request.getSize() < 0 || request.getName().isBlank()) {
             log.error("[x]Incorrect value of request's field for upload file - {}", request);
             throw new BadRequestException("incorrect field");
         }
