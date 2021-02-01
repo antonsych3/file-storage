@@ -5,12 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import ua.com.clm.filestorage.model.BaseFile;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileResponseDto implements BaseFile {
+public class FileResponseDto {
 
     @Id
     @JsonProperty("ID")

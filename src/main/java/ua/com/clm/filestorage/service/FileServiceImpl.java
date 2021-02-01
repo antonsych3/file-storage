@@ -59,10 +59,11 @@ public class FileServiceImpl implements FileService {
                 .findById(id)
                 .map(v -> {
                     List<String> actualTags = v.getTags();
-                    if (actualTags == null) {
-                        log.debug("[x]Here is no tag on this file ({})", id);
-                        actualTags = new ArrayList<>();
-                    }
+//                    if (actualTags == null) {
+//                        log.debug("[x]Here is no tag on this file ({})", id);
+//                        actualTags = new ArrayList<>();
+//                    }
+                    actualTags = actualTags == null ? new ArrayList<>() : actualTags;
                     actualTags.addAll(tags);
                     v.setTags(actualTags);
                     return fileRepository.save(v);

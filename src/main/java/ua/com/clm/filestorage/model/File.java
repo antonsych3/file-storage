@@ -15,7 +15,7 @@ import java.util.*;
 @NoArgsConstructor
 @JsonPropertyOrder({"id", "name", "size", "tags"})
 @Document(indexName = "file")
-public class File implements BaseFile {
+public class File {
 
     @Id
     private String id;

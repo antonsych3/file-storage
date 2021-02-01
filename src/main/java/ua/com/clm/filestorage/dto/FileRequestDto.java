@@ -1,10 +1,9 @@
 package ua.com.clm.filestorage.dto;
 
 import lombok.Data;
-import ua.com.clm.filestorage.model.BaseFile;
 
 @Data
-public class FileRequestDto implements BaseFile {
+public class FileRequestDto {
 
     private String name;
     private long size;

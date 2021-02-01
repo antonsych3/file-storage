@@ -8,7 +8,6 @@ import ua.com.clm.filestorage.dto.FileResponseDto;
 import ua.com.clm.filestorage.dto.FilesResponseDto;
 import ua.com.clm.filestorage.dto.ResponseDto;
 import ua.com.clm.filestorage.exception.BadRequestException;
-import ua.com.clm.filestorage.model.BaseFile;
 import ua.com.clm.filestorage.model.File;
 import ua.com.clm.filestorage.service.FileService;
 
@@ -36,11 +35,11 @@ public class FileStorageController {
 
     @PostMapping
     @ResponseBody
-    public BaseFile uploadFile(@RequestBody FileRequestDto fileRequestDto) {
+    public FileResponseDto uploadFile(@RequestBody FileRequestDto fileRequestDto) {
         log.info("[x]Request to upload file with name - {}", fileRequestDto.getName());
         checkRequest(fileRequestDto);
         File uploadedFile = fileService.uploadFile(new File(fileRequestDto));
-        log.info("[x]File with id = {} has been upload to the storage", uploadedFile.getId());
+        log.info("[x]File with id = {} has been uploaded to the storage", uploadedFile.getId());
         return new FileResponseDto(uploadedFile.getId());
     }
 
