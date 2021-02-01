@@ -91,14 +91,14 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FilesResponseDto getFilesByTags(List<String> tags, int page, int size) {
+    public FilesResponseDto getFilesByTags(Set<String> tags, String nameSubstring, int page, int size) {
         FilesResponseDto filesResponseDto = new FilesResponseDto();
         Page<File> pageableFiles;
 
         if (tags.isEmpty()) {
-            pageableFiles = fileRepository.findAll(PageRequest.of(page, size));
+            pageableFiles = fileRepository.findAllByNameContains(nameSubstring, PageRequest.of(page, size));
         } else {
-            pageableFiles = fileRepository.findAllByTags(tags, PageRequest.of(page, size));
+            pageableFiles = fileRepository.findAllByTagsAndNameContains(tags, nameSubstring, PageRequest.of(page, size));
         }
         filesResponseDto.setTotal((int) pageableFiles.getTotalElements());
         filesResponseDto.setFiles(pageableFiles.getContent());

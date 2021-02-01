@@ -12,7 +12,6 @@ import ua.com.clm.filestorage.model.File;
 import ua.com.clm.filestorage.service.FileService;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -25,11 +24,12 @@ public class FileStorageController {
 
     @GetMapping
     @ResponseBody
-    public FilesResponseDto getFiles(@RequestParam(defaultValue = "", required = false) List<String> tags,
+    public FilesResponseDto getFiles(@RequestParam(defaultValue = "", required = false) Set<String> tags,
                                      @RequestParam(defaultValue = "0", required = false) int page,
+                                     @RequestParam(name = "q", defaultValue = "", required = false) String nameSubstring,
                                      @RequestParam(defaultValue = "10", required = false) int size) {
         log.info("[x]Request to get files by tags - {}", tags);
-        FilesResponseDto filesResponseDto = fileService.getFilesByTags(tags, page, size);
+        FilesResponseDto filesResponseDto = fileService.getFilesByTags(tags, nameSubstring, page, size);
         log.info("[x]Got {} files by tags - {}", filesResponseDto.getTotal(), tags);
         return filesResponseDto;
     }
