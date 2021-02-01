@@ -3,7 +3,9 @@ package ua.com.clm.filestorage.service;
 import ua.com.clm.filestorage.dto.FilesResponseDto;
 import ua.com.clm.filestorage.model.File;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public interface FileService {
 
@@ -11,9 +13,9 @@ public interface FileService {
 
     void deleteFileById(String id);
 
-    void assignTags(List<String> tags, String id);
+    void assignTags(LinkedHashSet<String> tags, String id);
 
-    void removeTags(List<String> tags, String id);
+    void removeTags(Set<String> tags, String id);
 
     FilesResponseDto getFilesByTags(List<String> tags, int page, int size);
 }

@@ -30,7 +30,7 @@ class FileStorageControllerTest {
 
     @BeforeEach
     void init() {
-        doNothing().when(fileServiceMock).removeTags(anyList(), anyString());
+        doNothing().when(fileServiceMock).removeTags(anySet(), anyString());
     }
 
     @Test
@@ -39,7 +39,7 @@ class FileStorageControllerTest {
                 .post("/file/{ID}/tags", "file_id")
                 .contentType(MediaType.APPLICATION_JSON);
         sendRequest(contentTypeResult);
-        verify(fileServiceMock, times(1)).assignTags(anyList(), anyString());
+        verify(fileServiceMock, times(1)).assignTags(any(), anyString());
     }
 
     @Test
@@ -48,7 +48,7 @@ class FileStorageControllerTest {
                 .delete("/file/{ID}/tags", "file_id")
                 .contentType(MediaType.APPLICATION_JSON);
         sendRequest(contentTypeResult);
-        verify(fileServiceMock, times(1)).removeTags(anyList(), anyString());
+        verify(fileServiceMock, times(1)).removeTags(anySet(), anyString());
     }
 
     private void sendRequest(MockHttpServletRequestBuilder contentTypeResult) throws Exception {

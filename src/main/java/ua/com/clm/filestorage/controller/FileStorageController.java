@@ -11,7 +11,9 @@ import ua.com.clm.filestorage.exception.BadRequestException;
 import ua.com.clm.filestorage.model.File;
 import ua.com.clm.filestorage.service.FileService;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -54,7 +56,7 @@ public class FileStorageController {
 
     @PostMapping("/{ID}/tags")
     @ResponseBody
-    public ResponseDto assignTags(@RequestBody List<String> tags, @PathVariable("ID") String id) {
+    public ResponseDto assignTags(@RequestBody LinkedHashSet<String> tags, @PathVariable("ID") String id) {
         log.info("[x]Request to assign tags - {} for file with id = {}", tags, id);
         fileService.assignTags(tags, id);
         log.info("[x]Assigned tags - {} on the file with id = {}", tags, id);
@@ -63,7 +65,7 @@ public class FileStorageController {
 
     @DeleteMapping("/{ID}/tags")
     @ResponseBody
-    public ResponseDto removeTags(@RequestBody List<String> tags, @PathVariable("ID") String id) {
+    public ResponseDto removeTags(@RequestBody Set<String> tags, @PathVariable("ID") String id) {
         log.info("[x]Request to remove tags - {} for file with id = {}", tags, id);
         fileService.removeTags(tags, id);
         log.info("[x]Removed tags - {} from file with id = {}", tags, id);

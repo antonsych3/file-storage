@@ -12,10 +12,7 @@ import ua.com.clm.filestorage.model.File;
 import ua.com.clm.filestorage.repository.FileRepository;
 import ua.com.clm.filestorage.type.BaseTag;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -54,12 +51,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void assignTags(List<String> tags, String id) {
+    public void assignTags(LinkedHashSet<String> tags, String id) {
         fileRepository
                 .findById(id)
                 .map(v -> {
-                    List<String> actualTags = v.getTags();
-                    actualTags = actualTags == null ? new ArrayList<>() : actualTags;
+                    List<String> actualTags = (v.getTags()== null) ? new ArrayList<>() : v.getTags();
                     actualTags.addAll(tags);
                     v.setTags(actualTags);
                     return fileRepository.save(v);
@@ -69,7 +65,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void removeTags(List<String> tags, String id) {
+    public void removeTags(Set<String> tags, String id) {
         if (tags.isEmpty()) return;
         fileRepository.findById(id)
                 .map(v -> {
