@@ -10,7 +10,7 @@ import ua.com.clm.filestorage.dto.ResponseDto;
 import ua.com.clm.filestorage.exception.BadRequestException;
 import ua.com.clm.filestorage.model.BaseFile;
 import ua.com.clm.filestorage.model.File;
-import ua.com.clm.filestorage.sercice.FileService;
+import ua.com.clm.filestorage.service.FileService;
 
 import java.util.List;
 

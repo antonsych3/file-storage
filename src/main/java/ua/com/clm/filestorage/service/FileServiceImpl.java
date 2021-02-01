@@ -1,4 +1,4 @@
-package ua.com.clm.filestorage.sercice;
+package ua.com.clm.filestorage.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package ua.com.clm.filestorage.sercice;
+package ua.com.clm.filestorage.service;
 
 import ua.com.clm.filestorage.dto.FilesResponseDto;
 import ua.com.clm.filestorage.model.File;

@@ -1,4 +1,4 @@
-package ua.com.clm.filestorage.sercice;
+package ua.com.clm.filestorage.service;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
