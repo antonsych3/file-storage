@@ -106,13 +106,15 @@ public class FileServiceImpl implements FileService {
     }
 
     private File addAccordingTags(File file) {
-        String[] nameArray = file.getName().trim().split("\\.");
-        String extension = nameArray[nameArray.length - 1];
-        List<String> tags = new ArrayList<>();
-        BaseTag tag = (BaseTag) ALL_EXTENSIONS.get(extension.toLowerCase());
-        if (tag != null) {
-            tags.add(tag.getName());
-            file.setTags(tags);
+        if (file.getName().contains(".")) {
+            String trimmedName = file.getName().trim();
+            String extension = trimmedName.substring(trimmedName.lastIndexOf(".") + 1);
+            List<String> tags = new ArrayList<>();
+            BaseTag tag = (BaseTag) ALL_EXTENSIONS.get(extension.toLowerCase());
+            if (tag != null) {
+                tags.add(tag.getName());
+                file.setTags(tags);
+            }
         }
         return file;
     }
