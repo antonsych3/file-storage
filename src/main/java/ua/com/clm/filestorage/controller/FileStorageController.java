@@ -33,8 +33,8 @@ public class FileStorageController {
         try {
             int pageNumber = safeParseInt(page);
             int sizeNumber = safeParseInt(size);
-            filesResponseDto = fileService.getFilesByTags(tags, nameSubstring,
-                    PageRequest.of(pageNumber, sizeNumber));
+            filesResponseDto = fileService
+                    .getFilesByTagsAndName(tags, nameSubstring, PageRequest.of(pageNumber, sizeNumber));
         } catch (RuntimeException e) {
             log.warn("Some argument is wrong or here is no connection");
             return new FilesResponseDto();

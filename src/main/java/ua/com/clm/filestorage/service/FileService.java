@@ -12,9 +12,9 @@ public interface FileService {
 
     void deleteFileById(String id);
 
-    void assignTags(Set<String> tags, String id);
+    Set<String> assignTags(Set<String> tags, String id);
 
-    void removeTags(Set<String> tags, String id);
+    Set<String> removeTags(Set<String> tags, String id);
 
-    FilesResponseDto getFilesByTags(Set<String> tags, String nameSubstring, Pageable pageable);
+    FilesResponseDto getFilesByTagsAndName(Set<String> tags, String nameSubstring, Pageable pageable);
 }
