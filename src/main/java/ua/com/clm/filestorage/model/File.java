@@ -27,7 +27,7 @@ public class File {
     private long size;
 
     @Field(type = FieldType.Nested, searchAnalyzer = "true")
-    private List<String> tags = new ArrayList<>();
+    private Set<String> tags = new HashSet<>();
 
     public File(FileRequestDto fileRequestDto) {
         name = fileRequestDto.getName();

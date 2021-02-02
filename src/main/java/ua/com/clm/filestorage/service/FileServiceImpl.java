@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.clm.filestorage.dto.FilesResponseDto;
 import ua.com.clm.filestorage.exception.BadRequestException;
@@ -12,7 +13,10 @@ import ua.com.clm.filestorage.model.File;
 import ua.com.clm.filestorage.repository.FileRepository;
 import ua.com.clm.filestorage.type.BaseTag;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -51,16 +55,12 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void assignTags(LinkedHashSet<String> tags, String id) {
+    public void assignTags(Set<String> tags, String id) {
         fileRepository
                 .findById(id)
                 .map(v -> {
-                    List<String> actualTags = (v.getTags() == null) ? new ArrayList<>() : v.getTags();
-                    for (String tag : tags) {
-                        if (!actualTags.contains(tag)) {
-                            actualTags.add(tag);
-                        }
-                    }
+                    Set<String> actualTags = (v.getTags() == null) ? new HashSet<>() : v.getTags();
+                    actualTags.addAll(tags);
                     v.setTags(actualTags);
                     return fileRepository.save(v);
                 })
@@ -73,16 +73,11 @@ public class FileServiceImpl implements FileService {
         if (tags.isEmpty()) return;
         fileRepository.findById(id)
                 .map(v -> {
-                    List<String> actualTags = v.getTags();
-                    if (actualTags == null || actualTags.isEmpty()) {
+                    Set<String> actualTags = v.getTags();
+                    if (actualTags == null || actualTags.isEmpty() || !actualTags.containsAll(tags)) {
                         throw new BadRequestException(TAG_NOT_FOUND);
-                    }
-                    for (String tag : tags) {
-                        if (actualTags.contains(tag)) {
-                            actualTags.remove(tag);
-                        } else {
-                            throw new BadRequestException(TAG_NOT_FOUND);
-                        }
+                    } else {
+                        actualTags.removeAll(tags);
                     }
                     v.setTags(actualTags);
                     return fileRepository.save(v);
@@ -91,14 +86,16 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FilesResponseDto getFilesByTags(Set<String> tags, String nameSubstring, int page, int size) {
+    public FilesResponseDto getFilesByTags(Set<String> tags, String nameSubstring, Pageable pageable) {
         FilesResponseDto filesResponseDto = new FilesResponseDto();
         Page<File> pageableFiles;
 
         if (tags.isEmpty()) {
-            pageableFiles = fileRepository.findAllByNameContains(nameSubstring, PageRequest.of(page, size));
+            pageableFiles = fileRepository.findAllByNameContains(nameSubstring,
+                    PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
         } else {
-            pageableFiles = fileRepository.findAllByTagsAndNameContains(tags, nameSubstring, PageRequest.of(page, size));
+            pageableFiles = fileRepository.findAllByTagsAndNameContains(tags, nameSubstring,
+                    PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
         }
         filesResponseDto.setTotal((int) pageableFiles.getTotalElements());
         filesResponseDto.setFiles(pageableFiles.getContent());
@@ -109,7 +106,7 @@ public class FileServiceImpl implements FileService {
         if (file.getName().contains(".")) {
             String trimmedName = file.getName().trim();
             String extension = trimmedName.substring(trimmedName.lastIndexOf(".") + 1);
-            List<String> tags = new ArrayList<>();
+            Set<String> tags = new HashSet<>();
             BaseTag tag = (BaseTag) ALL_EXTENSIONS.get(extension.toLowerCase());
             if (tag != null) {
                 tags.add(tag.getName());
