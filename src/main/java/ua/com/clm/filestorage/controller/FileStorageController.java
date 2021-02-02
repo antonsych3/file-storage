@@ -22,19 +22,23 @@ public class FileStorageController {
 
     private final FileService fileService;
 
-    private static final int PAGE_NUMBER = 0;
-    private static final int PAGE_SIZE = 10;
-
     @GetMapping
-    @ResponseBody //todo blank q
+    @ResponseBody
     public FilesResponseDto getFiles(@RequestParam(defaultValue = "", required = false) Set<String> tags,
                                      @RequestParam(name = "q", defaultValue = "", required = false) String nameSubstring,
                                      @RequestParam(defaultValue = "0", required = false) String page,
                                      @RequestParam(defaultValue = "10", required = false) String size) {
         log.info("[x]Request to get files by tags - {} and name - {}", tags, nameSubstring);
-
-        FilesResponseDto filesResponseDto = fileService.getFilesByTags(tags, nameSubstring,
-                PageRequest.of(safeParseToInt(page, PAGE_NUMBER), safeParseToInt(size, PAGE_SIZE)));
+        FilesResponseDto filesResponseDto;
+        try {
+            int pageNumber = safeParseInt(page);
+            int sizeNumber = safeParseInt(size);
+            filesResponseDto = fileService.getFilesByTags(tags, nameSubstring,
+                    PageRequest.of(pageNumber, sizeNumber));
+        } catch (RuntimeException e) {
+            log.warn("Some argument is wrong or here is no connection");
+            return new FilesResponseDto();
+        }
         log.info("[x]Got {} files by tags - {} and name - {}", filesResponseDto.getTotal(), tags, nameSubstring);
         return filesResponseDto;
     }
@@ -76,12 +80,10 @@ public class FileStorageController {
         return new ResponseDto(true);
     }
 
-    private int safeParseToInt(String number, int defaultValue) {
-        try {
-            return Integer.parseInt(number) <= 0 ? defaultValue : Integer.parseInt(number);
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
+    private int safeParseInt(String text) {
+        int number = Integer.parseInt(text);
+        if (number < 0) throw new NumberFormatException("Negative size and page");
+        return number;
     }
 
     private void checkRequest(FileRequestDto request) {

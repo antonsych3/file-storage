@@ -2,14 +2,14 @@ package ua.com.clm.filestorage.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ua.com.clm.filestorage.dto.ErrorResponseDto;
 import ua.com.clm.filestorage.exception.BadRequestException;
 import ua.com.clm.filestorage.exception.FileNotFoundException;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({BadRequestException.class, FileNotFoundException.class})
