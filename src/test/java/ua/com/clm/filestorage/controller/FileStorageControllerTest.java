@@ -10,7 +10,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.clm.filestorage.dto.FileRequestDto;
 import ua.com.clm.filestorage.dto.FileResponseDto;
 import ua.com.clm.filestorage.dto.FilesResponseDto;
@@ -24,8 +23,10 @@ import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 @SpringBootTest
 class FileStorageControllerTest {
@@ -45,10 +46,9 @@ class FileStorageControllerTest {
             filesResponseDto.setTotal(3);
             filesResponseDto.setFiles(new ArrayList<>());
             doReturn(filesResponseDto).when(fileServiceMock).getFilesByTagsAndName(anySet(), anyString(), any());
-            MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/file");
-            MockMvcBuilders.standaloneSetup(fileStorageController)
+            standaloneSetup(fileStorageController)
                     .build()
-                    .perform(requestBuilder)
+                    .perform(get("/file"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType("application/json"))
                     .andExpect(content()
@@ -58,10 +58,10 @@ class FileStorageControllerTest {
 
         @Test
         void testGetFiles_shouldReturnEmptyDto_ifParametersAreNotAbleForParsing() throws Exception {
-            MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/file")
+            MockHttpServletRequestBuilder requestBuilder = get("/file")
                     .param("size", "a")
                     .param("size", "b");
-            MockMvcBuilders.standaloneSetup(fileStorageController)
+            standaloneSetup(fileStorageController)
                     .build()
                     .perform(requestBuilder)
                     .andExpect(status().isOk())
@@ -76,14 +76,15 @@ class FileStorageControllerTest {
     class UploadFileTest {
 
         @Test
-        void testUploadFile_shouldSkipAllValidation_ifParametersAreCorrect() throws Exception {
+        void uploadFile_shouldSkipAllValidation_ifParametersAreCorrect() throws Exception {
             File uploadedFile = new File();
             uploadedFile.setId("some id");
             doReturn(uploadedFile).when(fileServiceMock).uploadFile(any(File.class));
-            MockHttpServletRequestBuilder contentTypeResult = MockMvcRequestBuilders.post("/file")
+            MockHttpServletRequestBuilder contentTypeResult = MockMvcRequestBuilders
+                    .post("/file")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(new ObjectMapper().writeValueAsString(new FileRequestDto("MP3", 0)));
-            MockMvcBuilders.standaloneSetup(fileStorageController)
+            standaloneSetup(fileStorageController)
                     .build()
                     .perform(contentTypeResult)
                     .andExpect(status().isOk())
@@ -96,14 +97,14 @@ class FileStorageControllerTest {
         }
 
         @Test
-        void uploadFile_shouldReturnErrorResponse_ifNameIsNull() throws Exception {
+        void testUploadFile_shouldReturnErrorResponse_ifSizeIsNegative() throws Exception {
             File uploadedFile = new File();
             uploadedFile.setId("some id");
             doReturn(uploadedFile).when(fileServiceMock).uploadFile(any(File.class));
             MockHttpServletRequestBuilder contentTypeResult = MockMvcRequestBuilders.post("/file")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(new ObjectMapper().writeValueAsString(new FileRequestDto("  ", -42)));
-            MockMvcBuilders.standaloneSetup(fileStorageController)
+            standaloneSetup(fileStorageController)
                     .build()
                     .perform(contentTypeResult)
                     .andExpect(status().isBadRequest())
@@ -114,14 +115,14 @@ class FileStorageControllerTest {
         }
 
         @Test
-        void testUploadFile_shouldReturnErrorResponse_ifSizeIsNegative() throws Exception {
+        void uploadFile_shouldReturnErrorResponse_ifNameIsNull() throws Exception {
             File uploadedFile = new File();
             uploadedFile.setId("some id");
             doReturn(uploadedFile).when(fileServiceMock).uploadFile(any(File.class));
             MockHttpServletRequestBuilder contentTypeResult = MockMvcRequestBuilders.post("/file")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(new ObjectMapper().writeValueAsString(new FileRequestDto(null, 0)));
-            MockMvcBuilders.standaloneSetup(fileStorageController)
+            standaloneSetup(fileStorageController)
                     .build()
                     .perform(contentTypeResult)
                     .andExpect(status().isBadRequest())
@@ -140,7 +141,7 @@ class FileStorageControllerTest {
                 .post("/file/{ID}/tags", "some_id")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(new HashSet<String>()));
-        MockMvcBuilders.standaloneSetup(fileStorageController)
+        standaloneSetup(fileStorageController)
                 .build()
                 .perform(requestBuilder)
                 .andExpect(status().isOk())
@@ -156,7 +157,7 @@ class FileStorageControllerTest {
                 .delete("/file/{ID}/tags", "value")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(new HashSet<String>()));
-        MockMvcBuilders.standaloneSetup(fileStorageController)
+        standaloneSetup(fileStorageController)
                 .build()
                 .perform(requestBuilder)
                 .andExpect(status().isOk())
@@ -172,7 +173,7 @@ class FileStorageControllerTest {
                 .delete("/file/{ID}", "value")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(new HashSet<String>()));
-        MockMvcBuilders.standaloneSetup(fileStorageController)
+        standaloneSetup(fileStorageController)
                 .build()
                 .perform(requestBuilder)
                 .andExpect(status().isOk())
