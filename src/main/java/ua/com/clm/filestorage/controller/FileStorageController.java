@@ -25,7 +25,7 @@ public class FileStorageController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public File getFileById(@PathVariable String id){
+    public File getFileById(@PathVariable String id) {
         log.info("Got request for file with id - {}", id);
         File responseDto = fileService.getFileById(id);
         log.info("Returned file with id - {}", id);
@@ -41,13 +41,11 @@ public class FileStorageController {
         log.info("[x]Request to get files by tags - {} and name - {}", tags, nameSubstring);
         FilesResponseDto filesResponseDto;
         try {
-            int pageNumber = safeParseInt(page);
-            int sizeNumber = safeParseInt(size);
             filesResponseDto = fileService
-                    .getFilesByTagsAndName(tags, nameSubstring, PageRequest.of(pageNumber, sizeNumber));
+                    .getFilesByTagsAndName(tags, nameSubstring, PageRequest.of(safeParseInt(page), safeParseInt(size)));
         } catch (RuntimeException e) {
-            log.warn("Some argument is wrong or here is no connection");
-            return new FilesResponseDto();
+            log.warn("Some argument is wrong or here is no connection", e);
+            throw new BadRequestException("wrong parameters");
         }
         log.info("[x]Got {} files by tags - {} and name - {}", filesResponseDto.getTotal(), tags, nameSubstring);
         return filesResponseDto;
@@ -97,7 +95,7 @@ public class FileStorageController {
     }
 
     private void checkRequest(FileRequestDto request) {
-        if (request.getName() == null || request.getSize()==null) {
+        if (request.getName() == null || request.getSize() == null) {
             log.error("[x]Some field for upload file request is empty - {}", request);
             throw new BadRequestException("empty name field");
         }
