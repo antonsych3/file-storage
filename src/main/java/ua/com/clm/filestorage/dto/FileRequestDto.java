@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class FileRequestDto {
 
     private String name;
-    private long size;
+    private Long size;
 
     @Override
     public String toString() {

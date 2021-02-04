@@ -114,6 +114,16 @@ public class FileServiceImpl implements FileService {
         return filesResponseDto;
     }
 
+    @Override
+    public File getFileById(String id) {
+       return fileRepository.findById(id)
+                .orElseThrow(() -> {
+                            log.error("[x] {}", FILE_NOT_FOUND);
+                            return new FileNotFoundException(FILE_NOT_FOUND);
+                        }
+                );
+    }
+
     private File addAccordingTags(File file) {
         String name = file.getName();
         if (name != null && name.contains(".")) {

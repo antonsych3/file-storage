@@ -3,6 +3,7 @@ package ua.com.clm.filestorage.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ua.com.clm.filestorage.dto.FileRequestDto;
 import ua.com.clm.filestorage.dto.FileResponseDto;
@@ -21,6 +22,15 @@ import java.util.Set;
 public class FileStorageController {
 
     private final FileService fileService;
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public File getFileById(@PathVariable String id){
+        log.info("Got request for file with id - {}", id);
+        File responseDto = fileService.getFileById(id);
+        log.info("Returned file with id - {}", id);
+        return responseDto;
+    }
 
     @GetMapping
     @ResponseBody
@@ -87,7 +97,7 @@ public class FileStorageController {
     }
 
     private void checkRequest(FileRequestDto request) {
-        if (request.getName() == null) {
+        if (request.getName() == null || request.getSize()==null) {
             log.error("[x]Some field for upload file request is empty - {}", request);
             throw new BadRequestException("empty name field");
         }

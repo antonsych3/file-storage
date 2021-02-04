@@ -4,30 +4,44 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ua.com.clm.filestorage.dto.ErrorResponseDto;
 import ua.com.clm.filestorage.dto.FileRequestDto;
 import ua.com.clm.filestorage.dto.FileResponseDto;
 import ua.com.clm.filestorage.dto.FilesResponseDto;
 import ua.com.clm.filestorage.exception.BadRequestException;
+import ua.com.clm.filestorage.exception.FileNotFoundException;
+import ua.com.clm.filestorage.handler.CustomExceptionHandler;
 import ua.com.clm.filestorage.model.File;
 import ua.com.clm.filestorage.service.FileService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import ua.com.clm.filestorage.service.FileServiceImpl;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.isA;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 class FileStorageControllerTest {
 
@@ -36,6 +50,54 @@ class FileStorageControllerTest {
 
     @Autowired
     private FileStorageController fileStorageController;
+
+    @Nested
+    class GetFileByIdTest {
+
+        @Test
+        void getFileById() throws Exception {
+            File expectedFile = new File();
+            expectedFile.setName("some name");
+            expectedFile.setId("42");
+            expectedFile.setTags(new HashSet<>());
+            expectedFile.setSize(23L);
+            doReturn(expectedFile).when(fileServiceMock).getFileById(anyString());
+            MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                    .get("/file/{ID}", "42")
+                    .contentType(MediaType.APPLICATION_JSON);
+            standaloneSetup(fileStorageController)
+                    .build()
+                    .perform(builder)
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType("application/json"))
+                    .andExpect(content()
+                            .string(Matchers.containsString(new ObjectMapper().writeValueAsString(expectedFile))));
+            verify(fileServiceMock, times(1)).getFileById(anyString());
+        }
+
+        @Test
+        void getFileById2() throws Exception {
+            ErrorResponseDto error = new ErrorResponseDto();
+            error.setError("file not found");
+            error.setSuccess(false);
+            doThrow(new FileNotFoundException("file not found")).when(fileServiceMock).getFileById(anyString());
+            MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                    .get("/file/{ID}", "42")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON);
+            standaloneSetup(fileStorageController)
+                    .setControllerAdvice(CustomExceptionHandler.class)
+                    .build()
+                    .perform(builder)
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().contentTypeCompatibleWith("application/json"))
+                    .andExpect(content()
+                            .string(Matchers.containsString(new ObjectMapper().writeValueAsString(error))));
+            verify(fileServiceMock, times(1)).getFileById(anyString());
+        }
+
+
+    }
 
     @Nested
     class GetFilesTest {
@@ -83,7 +145,7 @@ class FileStorageControllerTest {
             MockHttpServletRequestBuilder contentTypeResult = MockMvcRequestBuilders
                     .post("/file")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(new FileRequestDto("MP3", 0)));
+                    .content(new ObjectMapper().writeValueAsString(new FileRequestDto("MP3", 0L)));
             standaloneSetup(fileStorageController)
                     .build()
                     .perform(contentTypeResult)
@@ -103,7 +165,7 @@ class FileStorageControllerTest {
             doReturn(uploadedFile).when(fileServiceMock).uploadFile(any(File.class));
             MockHttpServletRequestBuilder contentTypeResult = MockMvcRequestBuilders.post("/file")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(new FileRequestDto("  ", -42)));
+                    .content(new ObjectMapper().writeValueAsString(new FileRequestDto("  ", -42L)));
             standaloneSetup(fileStorageController)
                     .build()
                     .perform(contentTypeResult)
@@ -121,7 +183,7 @@ class FileStorageControllerTest {
             doReturn(uploadedFile).when(fileServiceMock).uploadFile(any(File.class));
             MockHttpServletRequestBuilder contentTypeResult = MockMvcRequestBuilders.post("/file")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(new FileRequestDto(null, 0)));
+                    .content(new ObjectMapper().writeValueAsString(new FileRequestDto(null, 0L)));
             standaloneSetup(fileStorageController)
                     .build()
                     .perform(contentTypeResult)

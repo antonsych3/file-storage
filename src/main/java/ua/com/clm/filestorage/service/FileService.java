@@ -17,4 +17,6 @@ public interface FileService {
     Set<String> removeTags(Set<String> tags, String id);
 
     FilesResponseDto getFilesByTagsAndName(Set<String> tags, String nameSubstring, Pageable pageable);
+
+    File getFileById(String id);
 }

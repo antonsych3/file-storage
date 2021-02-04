@@ -15,4 +15,5 @@ public interface FileRepository extends ElasticsearchRepository<File, String> {
     Page<File> findAllByTagsAndNameContains(Set<String> tags, String nameSubstring, Pageable pageable);
 
     Page<File> findAllByNameContains(String nameSubstring, PageRequest of);
+
 }
