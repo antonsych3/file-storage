@@ -24,12 +24,11 @@ import ua.com.cml.filestorage.service.FileService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.isNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -89,8 +88,6 @@ class FileStorageControllerTest {
                             .string(Matchers.containsString(new ObjectMapper().writeValueAsString(error))));
             verify(fileServiceMock, times(1)).getFileById(anyString());
         }
-
-
     }
 
     @Nested
@@ -114,16 +111,19 @@ class FileStorageControllerTest {
 
         @Test
         void testGetFiles_shouldReturnEmptyDto_ifParametersAreNotAbleForParsing() throws Exception {
+            ErrorResponseDto errorResponseDto = new ErrorResponseDto();
+            errorResponseDto.setError("wrong parameters");
             MockHttpServletRequestBuilder requestBuilder = get("/file")
                     .param("size", "a")
-                    .param("size", "b");
+                    .param("page", "b");
             standaloneSetup(fileStorageController)
+                    .setControllerAdvice(CustomExceptionHandler.class)
                     .build()
                     .perform(requestBuilder)
-                    .andExpect(status().isOk())
+                    .andExpect(status().isBadRequest())
                     .andExpect(content().contentType("application/json"))
                     .andExpect(content()
-                            .string(Matchers.containsString(new ObjectMapper().writeValueAsString(new FilesResponseDto()))));
+                            .string(Matchers.containsString(new ObjectMapper().writeValueAsString(errorResponseDto))));
             verify(fileServiceMock, times(0)).getFilesByTagsAndName(anySet(), anyString(), any());
         }
     }
@@ -166,7 +166,7 @@ class FileStorageControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRequestException))
                     .andExpect(result ->
-                            assertEquals("incorrect field", result.getResolvedException().getMessage()));
+                            assertEquals("incorrect field", Objects.requireNonNull(result.getResolvedException()).getMessage()));
             verify(fileServiceMock, times(0)).uploadFile(any(File.class));
         }
 
@@ -184,7 +184,7 @@ class FileStorageControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRequestException))
                     .andExpect(result ->
-                            assertEquals("empty name field", result.getResolvedException().getMessage()));
+                            assertEquals("empty name field", Objects.requireNonNull(result.getResolvedException()).getMessage()));
             verify(fileServiceMock, times(0)).uploadFile(any(File.class));
         }
     }
